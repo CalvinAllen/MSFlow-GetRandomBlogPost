@@ -1,0 +1,50 @@
+{
+  "schema": "1.0",
+  "details": {
+    "displayName": "Get Random Blog Post",
+    "description": "",
+    "createdTime": "2019-07-25T21:01:47.6391433Z",
+    "packageTelemetryId": "bbebcd48-d022-4cef-b91b-208b10ed39a2",
+    "creator": "Calvin Allen",
+    "sourceEnvironment": ""
+  },
+  "resources": {
+    "89c09ec5-c825-4447-a7fa-2ffaa46241b5": {
+      "type": "Microsoft.Flow/flows",
+      "suggestedCreationType": "New",
+      "creationType": "Existing, New, Update",
+      "details": { "displayName": "Get Random Blog Post (Sub Flow)" },
+      "configurableBy": "User",
+      "hierarchy": "Root",
+      "dependsOn": [
+        "d8e11bd1-be76-4e80-92b3-0a4296c46518",
+        "2c90e292-d7a0-44d0-86e9-64af46293a4c"
+      ]
+    },
+    "d8e11bd1-be76-4e80-92b3-0a4296c46518": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_rss",
+      "name": "shared_rss",
+      "type": "Microsoft.PowerApps/apis",
+      "suggestedCreationType": "Existing",
+      "details": {
+        "displayName": "RSS",
+        "iconUri": "https://connectoricons-prod.azureedge.net/rss/icon_1.0.1220.1615.png"
+      },
+      "configurableBy": "System",
+      "hierarchy": "Child",
+      "dependsOn": []
+    },
+    "2c90e292-d7a0-44d0-86e9-64af46293a4c": {
+      "type": "Microsoft.PowerApps/apis/connections",
+      "suggestedCreationType": "Existing",
+      "creationType": "Existing",
+      "details": {
+        "displayName": "RSS",
+        "iconUri": "https://connectoricons-prod.azureedge.net/rss/icon_1.0.1220.1615.png"
+      },
+      "configurableBy": "User",
+      "hierarchy": "Child",
+      "dependsOn": ["d8e11bd1-be76-4e80-92b3-0a4296c46518"]
+    }
+  }
+}

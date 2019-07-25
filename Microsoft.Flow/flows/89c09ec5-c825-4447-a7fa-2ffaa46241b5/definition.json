@@ -1,0 +1,127 @@
+{
+  "name": "94657ba9-6747-4709-a0c1-44e42c9f8d59",
+  "id": "/providers/Microsoft.Flow/flows/94657ba9-6747-4709-a0c1-44e42c9f8d59",
+  "type": "Microsoft.Flow/flows",
+  "properties": {
+    "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+    "displayName": "Get Random Blog Post (Sub Flow)",
+    "definition": {
+      "metadata": {
+        "workflowEntityId": null,
+        "creator": {
+          "id": "275d6c0c-ffb6-489d-86bb-46c6503ef26a",
+          "type": "User",
+          "tenantId": "6e23105c-65fe-4fb7-b6e1-20a39f3cbd67"
+        },
+        "provisioningMethod": "FromDefinition",
+        "failureAlertSubscription": true,
+        "clientLastModifiedTime": "2019-07-20T22:31:59.6247658Z"
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": { "defaultValue": {}, "type": "Object" },
+        "$authentication": { "defaultValue": {}, "type": "SecureObject" }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": { "schema": {}, "method": "GET" }
+        }
+      },
+      "actions": {
+        "List_all_RSS_feed_items": {
+          "runAfter": {},
+          "metadata": {
+            "flowSystemMetadata": { "swaggerOperationId": "ListFeedItems" }
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['shared_rss']['connectionId']"
+              },
+              "api": {
+                "runtimeUrl": "https://unitedstates-002.azure-apim.net/apim/rss"
+              }
+            },
+            "method": "get",
+            "path": "/ListFeedItems",
+            "queries": { "feedUrl": "" },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Initialize_TotalPosts": {
+          "runAfter": { "List_all_RSS_feed_items": ["Succeeded"] },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "TotalPosts",
+                "type": "Integer",
+                "value": "@sub(length(body('List_all_RSS_feed_items')), 1)"
+              }
+            ]
+          }
+        },
+        "Initialize_RandomPostNumber": {
+          "runAfter": { "Initialize_TotalPosts": ["Succeeded"] },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "RandomPostNumber",
+                "type": "Integer",
+                "value": "@rand(0, variables('TotalPosts'))"
+              }
+            ]
+          }
+        },
+        "RandomBlogPost": {
+          "runAfter": { "Initialize_RandomPostNumber": ["Succeeded"] },
+          "type": "Compose",
+          "inputs": "@body('List_all_RSS_feed_items')[variables('RandomPostNumber')]"
+        },
+        "Response": {
+          "runAfter": { "TransformBlogPost": ["Succeeded"] },
+          "type": "Response",
+          "kind": "Http",
+          "inputs": {
+            "statusCode": 200,
+            "body": "@body('TransformBlogPost')",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "shortUrl": { "type": "string" },
+                "hashTags": { "type": "string" },
+                "title": { "type": "string" },
+                "summary": { "type": "string" }
+              }
+            }
+          }
+        },
+        "TransformBlogPost": {
+          "runAfter": { "RandomBlogPost": ["Succeeded"] },
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "",
+            "headers": { "Content-Type": "application/json" },
+            "body": "@outputs('RandomBlogPost')"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "connectionReferences": {
+      "shared_rss": {
+        "connectionName": "shared-rss-d680b990-a608-4340-bd2b-a43b930c41ee",
+        "source": "Embedded",
+        "id": "/providers/Microsoft.PowerApps/apis/shared_rss",
+        "tier": "NotSpecified"
+      }
+    },
+    "flowFailureAlertSubscribed": false
+  }
+}
